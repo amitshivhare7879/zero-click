@@ -18,8 +18,11 @@ TELEGRAM_BOT_TOKEN = (os.getenv("TELEGRAM_BOT_TOKEN") or os.getenv("telegram_acc
 # =====================================================================
 # Local Resilient SQLite Database Engine (Postgres/Supabase Mock Adapter)
 # Single source of truth when offline or during judging demo
-# =====================================================================
-LOCAL_DB_PATH = os.path.join(os.path.dirname(__file__), "kirana_local.db")
+# On Vercel serverless functions, only /tmp is writable
+if os.environ.get("VERCEL"):
+    LOCAL_DB_PATH = "/tmp/kirana_local.db"
+else:
+    LOCAL_DB_PATH = os.path.join(os.path.dirname(__file__), "kirana_local.db")
 
 
 class MockQueryBuilder:

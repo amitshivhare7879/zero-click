@@ -41,7 +41,8 @@ if not os.path.exists(STATIC_DIR):
 
 @app.on_event("startup")
 async def on_startup():
-    if TELEGRAM_BOT_TOKEN:
+    # Only run infinite polling loop in long-running server environments (not Vercel serverless)
+    if TELEGRAM_BOT_TOKEN and not os.environ.get("VERCEL"):
         print("[STARTUP] Launching Telegram Bot background polling task...")
         asyncio.create_task(start_telegram_polling_loop())
 
