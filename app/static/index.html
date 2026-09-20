@@ -1,0 +1,1007 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Zero-Click Kirana Operator — Autonomous Store Platform</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+          },
+          colors: {
+            brand: {
+              50: '#f0fdf4',
+              100: '#dcfce7',
+              500: '#22c55e',
+              600: '#16a34a',
+              700: '#15803d',
+              900: '#14532d',
+            }
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    body { font-family: 'Plus Jakarta Sans', sans-serif; }
+    .custom-scroll::-webkit-scrollbar { width: 5px; height: 5px; }
+    .custom-scroll::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 9999px; }
+    .custom-scroll::-webkit-scrollbar-track { background: transparent; }
+  </style>
+</head>
+<body class="bg-slate-50 text-slate-900 min-h-screen flex flex-col antialiased">
+
+  <!-- ================= TOP NAVIGATION BAR ================= -->
+  <header class="bg-white border-b border-slate-200 sticky top-0 z-40 shadow-sm">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+      
+      <!-- Brand & Store Selection -->
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-emerald-600 to-teal-500 flex items-center justify-center text-white font-bold text-xl shadow-md shadow-emerald-500/20">
+          🛒
+        </div>
+        <div>
+          <div class="flex items-center gap-2">
+            <span class="font-bold text-slate-900 tracking-tight text-base sm:text-lg">Zero-Click Kirana</span>
+            <span class="text-[10px] font-bold uppercase tracking-wider bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded-full">Track 1</span>
+          </div>
+          <div class="flex items-center gap-1.5 text-xs text-slate-500">
+            <span>Store:</span>
+            <select id="storeSelect" onchange="switchStore(this.value)" class="bg-transparent font-medium text-slate-800 hover:text-emerald-700 cursor-pointer focus:outline-none pr-1">
+              <!-- Loaded dynamically from /stores -->
+              <option value="">Loading stores...</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <!-- Channel & Connectivity Badges -->
+      <div class="hidden md:flex items-center gap-2">
+        <div id="badgeDb" class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-slate-100 text-slate-700 border border-slate-200">
+          <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+          <span id="dbName">Supabase DB</span>
+        </div>
+        <div id="badgeWa" class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-emerald-50 text-emerald-800 border border-emerald-200">
+          <svg class="w-3.5 h-3.5 text-emerald-600 fill-current" viewBox="0 0 24 24"><path d="M12.031 6.172c-3.181 0-5.767 2.586-5.768 5.766-.001 1.298.38 2.27 1.019 3.287l-.582 2.128 2.182-.573c.978.58 1.911.928 3.145.929 3.178 0 5.767-2.587 5.768-5.766.001-3.187-2.575-5.77-5.764-5.771zm3.392 8.244c-.144.405-.837.774-1.17.824-.299.045-.677.063-1.092-.069-.252-.08-.575-.187-.988-.365-1.739-.751-2.874-2.502-2.961-2.617-.087-.116-.708-.94-.708-1.793s.448-1.273.607-1.446c.159-.173.346-.217.462-.217l.332.006c.106.005.249-.04.39.298.144.347.491 1.2.534 1.287.043.087.072.188.014.303-.058.116-.087.188-.173.289l-.26.303c-.087.086-.177.18-.076.353.101.174.449.741.964 1.2 1.055.939 1.944 1.229 2.218 1.365.275.136.435.116.594-.067.159-.183.68-.794.86-1.069.18-.275.361-.231.607-.144.246.087 1.56.736 1.827.87.267.135.446.202.511.314.065.112.065.649-.079 1.054z"/></svg>
+          WhatsApp Live
+        </div>
+        <div id="badgeTg" class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-sky-50 text-sky-800 border border-sky-200">
+          <svg class="w-3.5 h-3.5 text-sky-600 fill-current" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4.64 6.8c-.15 1.58-.8 5.42-1.13 7.19-.14.75-.42 1-.68 1.03-.58.05-1.02-.38-1.58-.75-.88-.58-1.38-.94-2.23-1.5-.99-.65-.35-1.01.22-1.59.15-.15 2.71-2.48 2.76-2.69a.2.2 0 00-.05-.18c-.06-.05-.14-.03-.21-.02-.09.02-1.49.95-4.22 2.79-.4.27-.76.41-1.08.4-.36-.01-1.04-.2-1.55-.37-.63-.2-1.12-.31-1.08-.66.02-.18.27-.36.74-.55 2.92-1.27 4.86-2.11 5.83-2.51 2.78-1.16 3.35-1.36 3.73-1.36.08 0 .27.02.39.12.1.08.13.19.14.27-.01.06.01.24 0 .38z"/></svg>
+          Telegram Bot
+        </div>
+      </div>
+
+      <!-- Mode & User Login Profile -->
+      <div class="flex items-center gap-2 sm:gap-3">
+        <!-- View Mode Switcher -->
+        <div class="bg-slate-100 p-1 rounded-xl flex items-center border border-slate-200">
+          <button id="btnCustomerMode" onclick="setMode('customer')" class="px-3 py-1.5 text-xs font-semibold rounded-lg bg-white shadow-sm text-slate-800 transition">
+            🛍️ Order
+          </button>
+          <button id="btnOwnerMode" onclick="setMode('owner')" class="px-3 py-1.5 text-xs font-semibold rounded-lg text-slate-600 hover:text-slate-900 transition">
+            📊 Owner Portal
+          </button>
+        </div>
+
+        <!-- User Profile Pill & Login Button -->
+        <button onclick="openLoginModal()" class="flex items-center gap-2 bg-slate-900 text-white hover:bg-slate-800 px-3 py-1.5 rounded-xl text-xs font-medium transition shadow-sm">
+          <span class="w-6 h-6 rounded-full bg-emerald-500 text-slate-900 flex items-center justify-center font-bold text-[11px]" id="userAvatar">
+            R
+          </span>
+          <div class="text-left hidden sm:block">
+            <p id="userNameDisplay" class="font-semibold leading-tight">Ramesh Patel</p>
+            <p id="userPhoneDisplay" class="text-[10px] text-slate-300">9876543210</p>
+          </div>
+          <svg class="w-3.5 h-3.5 text-slate-400 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+        </button>
+      </div>
+
+    </div>
+  </header>
+
+  <!-- ================= MAIN CONTAINER ================= -->
+  <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6">
+
+    <!-- ================= CUSTOMER ORDERING VIEW ================= -->
+    <div id="customerView" class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+
+      <!-- LEFT COLUMN: Live Product Catalog (Real-time Supabase Fetch) -->
+      <div class="lg:col-span-4 bg-white rounded-2xl border border-slate-200 shadow-sm p-4 flex flex-col h-[750px]">
+        <div class="flex items-center justify-between pb-3 border-b border-slate-100">
+          <div>
+            <h2 class="font-bold text-slate-900 text-base">Store Products</h2>
+            <p class="text-xs text-slate-500">Live Inventory from Supabase</p>
+          </div>
+          <span id="productCountBadge" class="text-xs font-semibold px-2 py-0.5 rounded-full bg-slate-100 text-slate-600">0 items</span>
+        </div>
+
+        <!-- Search and Category Filters -->
+        <div class="pt-3 pb-2 space-y-2">
+          <input 
+            type="text" 
+            id="productSearchInput" 
+            oninput="renderProducts()"
+            placeholder="Search atta, oil, maggi, milk..." 
+            class="w-full text-xs rounded-xl border border-slate-200 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-emerald-500"
+          />
+          <div class="flex items-center gap-1.5 overflow-x-auto custom-scroll pb-1 text-xs">
+            <button onclick="filterCategory('all')" class="cat-pill px-2.5 py-1 rounded-lg font-medium whitespace-nowrap bg-slate-900 text-white">All</button>
+            <button onclick="filterCategory('grocery')" class="cat-pill px-2.5 py-1 rounded-lg font-medium whitespace-nowrap bg-slate-100 text-slate-600 hover:bg-slate-200">Grocery</button>
+            <button onclick="filterCategory('snacks')" class="cat-pill px-2.5 py-1 rounded-lg font-medium whitespace-nowrap bg-slate-100 text-slate-600 hover:bg-slate-200">Snacks</button>
+            <button onclick="filterCategory('dairy')" class="cat-pill px-2.5 py-1 rounded-lg font-medium whitespace-nowrap bg-slate-100 text-slate-600 hover:bg-slate-200">Dairy</button>
+            <button onclick="filterCategory('household')" class="cat-pill px-2.5 py-1 rounded-lg font-medium whitespace-nowrap bg-slate-100 text-slate-600 hover:bg-slate-200">Household</button>
+          </div>
+        </div>
+
+        <!-- Product List -->
+        <div id="productList" class="flex-1 overflow-y-auto space-y-2.5 custom-scroll pr-1 mt-1">
+          <!-- Dynamic cards injected via renderProducts() -->
+          <div class="p-8 text-center text-xs text-slate-400">Loading catalog from database...</div>
+        </div>
+      </div>
+
+      <!-- MIDDLE COLUMN: Conversational Kirana Agent Chat -->
+      <div class="lg:col-span-5 bg-white rounded-2xl border border-slate-200 shadow-sm flex flex-col h-[750px] overflow-hidden">
+        <!-- Chat Header -->
+        <div class="p-4 border-b border-slate-100 flex items-center justify-between bg-slate-50/50">
+          <div class="flex items-center gap-2.5">
+            <div class="w-8 h-8 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center font-bold text-sm">
+              🤖
+            </div>
+            <div>
+              <h3 class="font-bold text-slate-900 text-sm">Kirana AI Assistant</h3>
+              <p class="text-[11px] text-slate-500">Autonomous 7-step loop • Hinglish & Hindi</p>
+            </div>
+          </div>
+          <button onclick="clearChatHistory()" class="text-[11px] text-slate-400 hover:text-slate-600">Clear chat</button>
+        </div>
+
+        <!-- Messages Area -->
+        <div id="chatMessages" class="flex-1 overflow-y-auto p-4 space-y-3.5 custom-scroll">
+          <!-- Seeded welcome message -->
+          <div class="flex justify-start">
+            <div class="max-w-[85%] rounded-2xl rounded-bl-sm px-4 py-3 text-xs sm:text-sm bg-slate-100 text-slate-800 leading-relaxed space-y-1">
+              <p>Namaste! 🙏 <strong>Sharma Kirana</strong> mein aapka swagat hai. Aap bolkar ya likhkar kuch bhi mangwa sakte hain!</p>
+              <p class="text-xs text-slate-500">Jaise: <em>"2 packet atta, 1 fortune oil aur 3 maggi bhej do"</em></p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Quick Action Prompt Chips -->
+        <div class="px-4 py-2 border-t border-slate-100 bg-slate-50/40 flex items-center gap-1.5 overflow-x-auto custom-scroll text-xs">
+          <button onclick="sendQuickPrompt('2 packet atta aur 1 oil bhej do')" class="shrink-0 bg-white border border-slate-200 hover:border-emerald-500 text-slate-700 px-2.5 py-1 rounded-full shadow-2xs transition">
+            + 2 Atta & 1 Oil
+          </button>
+          <button onclick="sendQuickPrompt('Amul doodh 2 packet chahiye')" class="shrink-0 bg-white border border-slate-200 hover:border-amber-500 text-slate-700 px-2.5 py-1 rounded-full shadow-2xs transition">
+            🥛 Test Out-of-Stock Milk
+          </button>
+          <button onclick="sendQuickPrompt('Fortune sarson tel 1 bottle de do')" class="shrink-0 bg-white border border-slate-200 hover:border-amber-500 text-slate-700 px-2.5 py-1 rounded-full shadow-2xs transition">
+            🛢️ Test Out-of-Stock Oil
+          </button>
+          <button onclick="sendQuickPrompt('Haan confirm kar do')" class="shrink-0 bg-emerald-50 border border-emerald-300 text-emerald-800 font-medium px-2.5 py-1 rounded-full shadow-2xs transition">
+            ✅ Confirm Order
+          </button>
+        </div>
+
+        <!-- Chat Input Bar -->
+        <div class="p-3 border-t border-slate-200 bg-white flex items-center gap-2">
+          <input 
+            type="text" 
+            id="chatInput" 
+            onkeydown="if(event.key==='Enter') sendChatMessage()"
+            placeholder="Type your grocery order in Hinglish or English..." 
+            class="flex-1 rounded-xl border border-slate-200 px-3.5 py-2.5 text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-slate-900"
+          />
+          <button 
+            id="btnSendChat"
+            onclick="sendChatMessage()" 
+            class="bg-slate-900 hover:bg-slate-800 text-white px-4 py-2.5 rounded-xl font-medium text-xs sm:text-sm transition flex items-center gap-1.5 shadow-sm">
+            <span>Send</span>
+            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
+          </button>
+        </div>
+      </div>
+
+      <!-- RIGHT COLUMN: Interactive Live Cart & Receipt Generator -->
+      <div class="lg:col-span-3 bg-white rounded-2xl border border-slate-200 shadow-sm flex flex-col h-[750px] p-4">
+        <div class="flex items-center justify-between pb-3 border-b border-slate-100">
+          <div>
+            <h2 class="font-bold text-slate-900 text-base flex items-center gap-2">
+              <span>Your Cart</span>
+              <span id="cartCountBadge" class="bg-emerald-100 text-emerald-800 text-[11px] font-bold px-2 py-0.5 rounded-full">0</span>
+            </h2>
+            <p class="text-xs text-slate-500" id="cartDeliveryAddress">Delivery: Flat 402, Shivalik Heights</p>
+          </div>
+          <span id="orderStatusBadge" class="text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded-md bg-slate-100 text-slate-600">
+            DRAFT
+          </span>
+        </div>
+
+        <!-- Cart Items Feed -->
+        <div id="cartItemsList" class="flex-1 overflow-y-auto space-y-2 py-3 custom-scroll pr-1">
+          <div class="text-center py-12 text-slate-400 text-xs">
+            <p class="text-3xl mb-2">🛒</p>
+            <p>Your basket is currently empty.</p>
+            <p class="text-[11px] text-slate-400 mt-1">Chat or tap "+" on products to add items.</p>
+          </div>
+        </div>
+
+        <!-- Anomaly Warning Card (if flagged) -->
+        <div id="anomalyBanner" class="hidden mb-3 p-2.5 rounded-xl bg-amber-50 border border-amber-200 text-amber-900 text-xs flex items-start gap-2">
+          <span class="text-base">⚠️</span>
+          <div>
+            <span class="font-bold">Order Note:</span>
+            <span id="anomalyBannerText">Unusual quantity detected.</span>
+          </div>
+        </div>
+
+        <!-- Cart Footer & Actions -->
+        <div class="pt-3 border-t border-slate-100 space-y-3">
+          <div class="space-y-1 text-xs">
+            <div class="flex justify-between text-slate-500">
+              <span>Subtotal</span>
+              <span id="cartSubtotal" class="font-medium text-slate-800">₹0.00</span>
+            </div>
+            <div class="flex justify-between text-slate-500">
+              <span>Essential Delivery</span>
+              <span class="font-semibold text-emerald-600">FREE</span>
+            </div>
+            <div class="flex justify-between text-sm font-bold text-slate-900 pt-1 border-t border-slate-100">
+              <span>Total Amount</span>
+              <span id="cartTotal" class="text-base font-extrabold text-slate-900">₹0.00</span>
+            </div>
+          </div>
+
+          <button 
+            id="btnConfirmOrder"
+            onclick="placeDirectOrder()" 
+            class="w-full py-3 px-4 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs sm:text-sm transition flex items-center justify-center gap-2 shadow-lg shadow-emerald-600/20 disabled:opacity-40">
+            <span>Place Order Now</span>
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+          </button>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- ================= STORE OWNER DASHBOARD VIEW ================= -->
+    <div id="ownerView" class="hidden space-y-6">
+
+      <!-- KPI Summary Cards -->
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+        <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
+          <p class="text-xs font-semibold uppercase tracking-wider text-slate-400">Total Revenue</p>
+          <p id="metricRevenue" class="text-2xl font-extrabold text-slate-900 mt-1">₹0.00</p>
+          <span class="text-[11px] text-emerald-600 font-medium">From confirmed orders</span>
+        </div>
+        <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
+          <p class="text-xs font-semibold uppercase tracking-wider text-slate-400">Orders Processed</p>
+          <p id="metricOrders" class="text-2xl font-extrabold text-slate-900 mt-1">0</p>
+          <span class="text-[11px] text-slate-500" id="metricConfirmedOrders">0 confirmed</span>
+        </div>
+        <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
+          <p class="text-xs font-semibold uppercase tracking-wider text-slate-400">Anomaly Alerts</p>
+          <p id="metricAnomalies" class="text-2xl font-extrabold text-amber-600 mt-1">0</p>
+          <span class="text-[11px] text-amber-600 font-medium">Auto-flagged by rules</span>
+        </div>
+        <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
+          <p class="text-xs font-semibold uppercase tracking-wider text-slate-400">Low Stock Items</p>
+          <p id="metricLowStock" class="text-2xl font-extrabold text-rose-600 mt-1">0</p>
+          <span class="text-[11px] text-rose-600 font-medium">&le; 5 units left</span>
+        </div>
+      </div>
+
+      <!-- Orders & Inventory Manager (Two-column) -->
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+
+        <!-- Live Orders Feed -->
+        <div class="lg:col-span-7 bg-white rounded-2xl border border-slate-200 shadow-sm p-5">
+          <div class="flex items-center justify-between pb-4 border-b border-slate-100">
+            <div>
+              <h3 class="font-bold text-slate-900 text-base">Store Orders Feed</h3>
+              <p class="text-xs text-slate-500">Live order items, totals, and statuses</p>
+            </div>
+            <button onclick="loadOwnerDashboard()" class="text-xs font-semibold text-emerald-600 hover:text-emerald-700">Refresh</button>
+          </div>
+          <div id="ownerOrdersList" class="divide-y divide-slate-100 max-h-[500px] overflow-y-auto custom-scroll mt-2">
+            <!-- Dynamic order list -->
+            <p class="text-xs text-slate-400 py-6 text-center">Loading orders...</p>
+          </div>
+        </div>
+
+        <!-- Inventory Restocker & Anomalies -->
+        <div class="lg:col-span-5 space-y-6">
+
+          <!-- Inventory Stock Manager -->
+          <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-5">
+            <div class="flex items-center justify-between pb-3 border-b border-slate-100">
+              <h3 class="font-bold text-slate-900 text-sm">Quick Restock Controls</h3>
+              <span class="text-[11px] text-slate-400">Live Supabase Products</span>
+            </div>
+            <div id="ownerProductList" class="divide-y divide-slate-100 max-h-[260px] overflow-y-auto custom-scroll mt-2 text-xs">
+              <!-- Injected products with Restock buttons -->
+            </div>
+          </div>
+
+          <!-- Anomaly Flags Board -->
+          <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-5">
+            <div class="flex items-center justify-between pb-3 border-b border-slate-100">
+              <h3 class="font-bold text-slate-900 text-sm flex items-center gap-1.5">
+                <span>Anomaly Detection</span>
+                <span class="bg-amber-100 text-amber-800 px-2 py-0.2 rounded-full text-[10px] font-bold">Rules Engine</span>
+              </h3>
+            </div>
+            <div id="ownerAnomaliesList" class="space-y-2 max-h-[200px] overflow-y-auto custom-scroll mt-2 text-xs">
+              <!-- Injected anomaly cards -->
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+
+  </main>
+
+  <!-- ================= LOGIN & USER SWITCHER MODAL ================= -->
+  <div id="loginModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-white rounded-3xl max-w-md w-full shadow-2xl border border-slate-200 overflow-hidden">
+      <div class="p-6 border-b border-slate-100 flex items-center justify-between bg-slate-50/50">
+        <div>
+          <h3 class="text-base font-bold text-slate-900">Select Customer Account</h3>
+          <p class="text-xs text-slate-500">Log in as a pre-seeded user or register a new one</p>
+        </div>
+        <button onclick="closeLoginModal()" class="text-slate-400 hover:text-slate-600 text-xl font-bold">&times;</button>
+      </div>
+
+      <div class="p-6 space-y-4">
+        <!-- Pre-seeded real accounts from Supabase -->
+        <div>
+          <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">Registered Accounts (Supabase)</label>
+          <div id="modalCustomerList" class="space-y-2">
+            <!-- Dynamically populated from /customers -->
+            <p class="text-xs text-slate-400">Loading users...</p>
+          </div>
+        </div>
+
+        <div class="relative flex py-2 items-center">
+          <div class="flex-grow border-t border-slate-200"></div>
+          <span class="flex-shrink mx-3 text-slate-400 text-xs font-medium">Or Log In With Phone</span>
+          <div class="flex-grow border-t border-slate-200"></div>
+        </div>
+
+        <!-- Custom Login / Registration Form -->
+        <div class="space-y-2.5 text-xs">
+          <div>
+            <label class="block font-medium text-slate-700 mb-1">Phone Number</label>
+            <input type="text" id="customPhoneInput" placeholder="9876543210" class="w-full rounded-xl border border-slate-200 px-3 py-2 focus:ring-2 focus:ring-slate-900 focus:outline-none" />
+          </div>
+          <div>
+            <label class="block font-medium text-slate-700 mb-1">Full Name (optional for existing)</label>
+            <input type="text" id="customNameInput" placeholder="e.g. Rahul Verma" class="w-full rounded-xl border border-slate-200 px-3 py-2 focus:ring-2 focus:ring-slate-900 focus:outline-none" />
+          </div>
+          <div>
+            <label class="block font-medium text-slate-700 mb-1">Delivery Address</label>
+            <input type="text" id="customAddressInput" placeholder="e.g. Scheme 78, Vijay Nagar, Indore" class="w-full rounded-xl border border-slate-200 px-3 py-2 focus:ring-2 focus:ring-slate-900 focus:outline-none" />
+          </div>
+
+          <button onclick="submitCustomLogin()" class="w-full mt-2 py-2.5 bg-slate-900 hover:bg-slate-800 text-white font-bold rounded-xl transition text-xs">
+            Log In / Continue
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= ITEMIZED BILL MODAL ================= -->
+  <div id="billModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-white rounded-3xl max-w-md w-full shadow-2xl border border-slate-200 p-6 space-y-4">
+      <div class="flex items-center justify-between pb-3 border-b border-slate-100">
+        <div class="flex items-center gap-2">
+          <span class="text-2xl">🧾</span>
+          <div>
+            <h3 class="font-bold text-slate-900 text-base">Digital Kirana Receipt</h3>
+            <p class="text-xs text-slate-500">Order confirmed & live inventory deducted</p>
+          </div>
+        </div>
+        <button onclick="closeBillModal()" class="text-slate-400 hover:text-slate-600 text-xl font-bold">&times;</button>
+      </div>
+
+      <div class="bg-slate-50 rounded-2xl p-4 border border-slate-200 font-mono text-xs whitespace-pre-wrap leading-relaxed custom-scroll max-h-[360px] overflow-y-auto" id="billModalContent">
+        <!-- Text Bill formatted from server -->
+      </div>
+
+      <button onclick="closeBillModal()" class="w-full py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl text-xs transition">
+        Done & Continue Shopping
+      </button>
+    </div>
+  </div>
+
+  <!-- ================= JAVASCRIPT STATE & APPLICATION ENGINE ================= -->
+  <script>
+    const API_BASE = window.location.origin;
+
+    // State Variables
+    let currentStoreId = "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11";
+    let currentCustomer = {
+      id: "c0eebc99-9c0b-4ef8-bb6d-6bb9bd380a01",
+      name: "Ramesh Patel",
+      phone: "9876543210",
+      address: "Flat 402, Shivalik Heights, Depot Area, Indore"
+    };
+    let currentOrderId = null;
+    let allProducts = [];
+    let activeCategory = 'all';
+    let currentMode = 'customer';
+
+    // ================= INITIALIZATION =================
+    window.addEventListener('DOMContentLoaded', async () => {
+      await loadStores();
+      await loadCustomers();
+      await initCustomerSession();
+      await loadProducts();
+      await checkBotStatus();
+    });
+
+    // ================= STORE & SESSION MANAGEMENT =================
+    async function loadStores() {
+      try {
+        const res = await fetch(`${API_BASE}/stores`);
+        const stores = await res.json();
+        const select = document.getElementById('storeSelect');
+        select.innerHTML = stores.map(s => 
+          `<option value="${s.id}" ${s.id === currentStoreId ? 'selected' : ''}>${s.name}</option>`
+        ).join('');
+      } catch (err) {
+        console.error("Failed to fetch stores:", err);
+      }
+    }
+
+    async function switchStore(newStoreId) {
+      currentStoreId = newStoreId;
+      await loadProducts();
+      await initCustomerSession();
+      if (currentMode === 'owner') await loadOwnerDashboard();
+    }
+
+    async function checkBotStatus() {
+      try {
+        const res = await fetch(`${API_BASE}/bot/status`);
+        const data = await res.json();
+        document.getElementById('dbName').innerText = data.database;
+      } catch(e) {}
+    }
+
+    // ================= CUSTOMER LOGIN & SWITCHER =================
+    async function loadCustomers() {
+      try {
+        const res = await fetch(`${API_BASE}/customers?store_id=${currentStoreId}`);
+        const customers = await res.json();
+        const listEl = document.getElementById('modalCustomerList');
+        if (!customers.length) {
+          listEl.innerHTML = `<p class="text-xs text-slate-400">No customers found.</p>`;
+          return;
+        }
+
+        listEl.innerHTML = customers.map(c => `
+          <button onclick="selectCustomer('${c.id}', '${c.name.replace(/'/g, "\\'")}', '${c.phone}', '${(c.address || '').replace(/'/g, "\\'")}')" 
+            class="w-full text-left p-3 rounded-xl border ${c.phone === currentCustomer.phone ? 'border-emerald-500 bg-emerald-50/50' : 'border-slate-200 hover:bg-slate-50'} transition flex items-center justify-between">
+            <div>
+              <p class="font-bold text-slate-800 text-xs">${c.name} ${c.phone === currentCustomer.phone ? '✓ (Active)' : ''}</p>
+              <p class="text-[11px] text-slate-500">📞 ${c.phone} • 📍 ${c.address || 'Indore'}</p>
+            </div>
+            <span class="text-[11px] font-semibold text-emerald-700 bg-emerald-100 px-2 py-0.5 rounded-full">Select</span>
+          </button>
+        `).join('');
+      } catch (err) {
+        console.error("Error loading customers:", err);
+      }
+    }
+
+    async function selectCustomer(id, name, phone, address) {
+      currentCustomer = { id, name, phone, address };
+      updateUserUI();
+      closeLoginModal();
+      await initCustomerSession();
+    }
+
+    function updateUserUI() {
+      document.getElementById('userNameDisplay').innerText = currentCustomer.name;
+      document.getElementById('userPhoneDisplay').innerText = currentCustomer.phone;
+      document.getElementById('userAvatar').innerText = currentCustomer.name.charAt(0).toUpperCase();
+      document.getElementById('cartDeliveryAddress').innerText = `Delivery: ${currentCustomer.address || 'Indore'}`;
+    }
+
+    async function submitCustomLogin() {
+      const phone = document.getElementById('customPhoneInput').value.trim();
+      const name = document.getElementById('customNameInput').value.trim();
+      const address = document.getElementById('customAddressInput').value.trim();
+
+      if (!phone) {
+        alert("Please enter a phone number.");
+        return;
+      }
+
+      try {
+        const res = await fetch(`${API_BASE}/customers/login`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            store_id: currentStoreId,
+            phone: phone,
+            name: name || undefined,
+            address: address || undefined
+          })
+        });
+        const data = await res.json();
+        currentCustomer = data.customer;
+        updateUserUI();
+        closeLoginModal();
+        await initCustomerSession();
+        await loadCustomers();
+      } catch (err) {
+        alert("Login failed. Please try again.");
+      }
+    }
+
+    async function initCustomerSession() {
+      try {
+        const res = await fetch(`${API_BASE}/customers/login`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            store_id: currentStoreId,
+            phone: currentCustomer.phone,
+            name: currentCustomer.name,
+            address: currentCustomer.address
+          })
+        });
+        const data = await res.json();
+        if (data.active_order) {
+          currentOrderId = data.active_order.order.id;
+          renderCart(data.active_order);
+        }
+      } catch (err) {
+        console.error("Session init failed:", err);
+      }
+    }
+
+    function openLoginModal() {
+      loadCustomers();
+      document.getElementById('loginModal').classList.remove('hidden');
+    }
+
+    function closeLoginModal() {
+      document.getElementById('loginModal').classList.add('hidden');
+    }
+
+    // ================= PRODUCT CATALOG & ALTERNATIVES =================
+    async function loadProducts() {
+      try {
+        const res = await fetch(`${API_BASE}/stores/${currentStoreId}/products`);
+        allProducts = await res.json();
+        document.getElementById('productCountBadge').innerText = `${allProducts.length} items`;
+        renderProducts();
+      } catch (err) {
+        console.error("Failed to fetch products:", err);
+      }
+    }
+
+    function filterCategory(cat) {
+      activeCategory = cat;
+      document.querySelectorAll('.cat-pill').forEach(btn => {
+        if (btn.innerText.toLowerCase() === cat) {
+          btn.className = 'cat-pill px-2.5 py-1 rounded-lg font-medium whitespace-nowrap bg-slate-900 text-white';
+        } else {
+          btn.className = 'cat-pill px-2.5 py-1 rounded-lg font-medium whitespace-nowrap bg-slate-100 text-slate-600 hover:bg-slate-200';
+        }
+      });
+      renderProducts();
+    }
+
+    function renderProducts() {
+      const search = document.getElementById('productSearchInput').value.toLowerCase().trim();
+      const filtered = allProducts.filter(p => {
+        const matchesCategory = activeCategory === 'all' || p.category === activeCategory;
+        const matchesSearch = !search || p.name.toLowerCase().includes(search) || (p.alternative_names && p.alternative_names.toLowerCase().includes(search));
+        return matchesCategory && matchesSearch;
+      });
+
+      const container = document.getElementById('productList');
+      if (!filtered.length) {
+        container.innerHTML = `<div class="p-8 text-center text-xs text-slate-400">No matching products found.</div>`;
+        return;
+      }
+
+      container.innerHTML = filtered.map(p => {
+        const inStock = p.stock > 0;
+        return `
+          <div class="p-3 rounded-xl border border-slate-200 hover:border-slate-300 transition bg-white space-y-2">
+            <div class="flex items-start justify-between gap-2">
+              <div>
+                <h4 class="font-bold text-xs text-slate-900">${p.name}</h4>
+                <p class="text-[11px] text-slate-500 font-medium">₹${p.price.toFixed(2)} / ${p.unit}</p>
+              </div>
+              <span class="shrink-0 text-[10px] font-bold px-2 py-0.5 rounded-full ${inStock ? 'bg-emerald-100 text-emerald-800' : 'bg-rose-100 text-rose-800'}">
+                ${inStock ? `${p.stock} in stock` : 'Out of Stock'}
+              </span>
+            </div>
+
+            <!-- Out of Stock & Alternative Notification -->
+            ${!inStock && p.alternative_names ? `
+              <div class="p-2 rounded-lg bg-amber-50 border border-amber-200 text-[11px] text-amber-900 space-y-1">
+                <p class="font-semibold flex items-center gap-1">
+                  <span>💡 Alternative Recommended:</span>
+                </p>
+                <p class="text-amber-800">${p.alternative_names}</p>
+                <button onclick="addAlternativeDirectly('${p.alternative_names.split(',')[0].trim()}')" class="mt-1 w-full text-center py-1 rounded bg-amber-600 hover:bg-amber-700 text-white font-semibold text-[10px] transition">
+                  + Add Alternative Instead
+                </button>
+              </div>
+            ` : ''}
+
+            <!-- Add Button -->
+            ${inStock ? `
+              <div class="flex items-center justify-between pt-1">
+                <span class="text-[10px] uppercase font-semibold text-slate-400">${p.category}</span>
+                <button onclick="quickAddProduct('${p.id}', '${p.name.replace(/'/g, "\\'")}', ${p.price})" class="px-2.5 py-1 rounded-lg bg-slate-100 hover:bg-slate-900 hover:text-white text-slate-800 font-semibold text-xs transition">
+                  + Add to Cart
+                </button>
+              </div>
+            ` : ''}
+          </div>
+        `;
+      }).join('');
+    }
+
+    async function quickAddProduct(id, name, price) {
+      if (!currentOrderId) await initCustomerSession();
+      // Send chat turn to keep agent and audit log synced
+      await sendChatMessage(`1 packet ${name} bhej do`);
+    }
+
+    async function addAlternativeDirectly(altName) {
+      await sendChatMessage(`Theek hai, ${altName} add kar do`);
+    }
+
+    // ================= CONVERSATIONAL CHAT ENGINE =================
+    async function sendQuickPrompt(text) {
+      document.getElementById('chatInput').value = text;
+      await sendChatMessage();
+    }
+
+    async function sendChatMessage(customMsg = null) {
+      const input = document.getElementById('chatInput');
+      const text = customMsg || input.value.trim();
+      if (!text) return;
+
+      if (!customMsg) input.value = '';
+
+      appendMessage('customer', text);
+
+      const btn = document.getElementById('btnSendChat');
+      btn.disabled = true;
+      btn.innerHTML = `<span class="animate-pulse">Thinking...</span>`;
+
+      try {
+        const res = await fetch(`${API_BASE}/chat`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            store_id: currentStoreId,
+            customer_phone: currentCustomer.phone,
+            message: text
+          })
+        });
+        const data = await res.json();
+        appendMessage('agent', data.reply, data.suggested_alternatives);
+
+        if (data.order_id) {
+          currentOrderId = data.order_id;
+          await refreshCart(data.order_id);
+        }
+
+        // If onboarding completed or updated
+        if (data.customer) {
+          currentCustomer = data.customer;
+          updateUserUI();
+        }
+
+      } catch (err) {
+        appendMessage('agent', "Connection error with store server. Please try again.");
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = `<span>Send</span><svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>`;
+      }
+    }
+
+    function appendMessage(role, text, alternatives = []) {
+      const container = document.getElementById('chatMessages');
+      const div = document.createElement('div');
+      div.className = `flex ${role === 'customer' ? 'justify-end' : 'justify-start'}`;
+
+      let altHtml = '';
+      if (alternatives && alternatives.length) {
+        altHtml = `
+          <div class="mt-2 pt-2 border-t border-slate-200/80 space-y-1.5">
+            <p class="text-[11px] font-bold text-amber-900">Recommended In-Stock Alternatives:</p>
+            <div class="flex flex-wrap gap-1.5">
+              ${alternatives.map(a => `
+                <button onclick="sendChatMessage('1 ${a.name} add kar do')" class="text-[11px] bg-white border border-amber-300 text-slate-800 hover:border-slate-900 px-2 py-1 rounded-lg shadow-2xs transition">
+                  + ${a.name} (₹${a.price})
+                </button>
+              `).join('')}
+            </div>
+          </div>
+        `;
+      }
+
+      div.innerHTML = `
+        <div class="max-w-[85%] rounded-2xl px-4 py-3 text-xs sm:text-sm whitespace-pre-wrap leading-relaxed ${
+          role === 'customer' 
+            ? 'bg-slate-900 text-white rounded-br-sm' 
+            : 'bg-slate-100 text-slate-800 rounded-bl-sm'
+        }">
+          <p>${text}</p>
+          ${altHtml}
+        </div>
+      `;
+      container.appendChild(div);
+      container.scrollTop = container.scrollHeight;
+    }
+
+    function clearChatHistory() {
+      document.getElementById('chatMessages').innerHTML = `
+        <div class="flex justify-start">
+          <div class="max-w-[85%] rounded-2xl rounded-bl-sm px-4 py-3 text-xs sm:text-sm bg-slate-100 text-slate-800 leading-relaxed">
+            <p>Namaste! 🙏 Chat history cleared. Aap kya mangwana chahte hain?</p>
+          </div>
+        </div>
+      `;
+    }
+
+    // ================= CART & ORDER PROCESSING =================
+    async function refreshCart(orderId) {
+      if (!orderId) return;
+      try {
+        const res = await fetch(`${API_BASE}/orders/${orderId}`);
+        const data = await res.json();
+        renderCart(data);
+      } catch (err) {
+        console.error("Cart refresh failed:", err);
+      }
+    }
+
+    function renderCart(cartData) {
+      const items = cartData.items || [];
+      const order = cartData.order || {};
+      const flags = cartData.flags || [];
+
+      document.getElementById('cartCountBadge').innerText = items.reduce((acc, i) => acc + i.qty, 0);
+      document.getElementById('cartSubtotal').innerText = `₹${order.total ? order.total.toFixed(2) : '0.00'}`;
+      document.getElementById('cartTotal').innerText = `₹${order.total ? order.total.toFixed(2) : '0.00'}`;
+
+      const statusBadge = document.getElementById('orderStatusBadge');
+      statusBadge.innerText = (order.status || 'DRAFT').toUpperCase();
+      if (order.status === 'confirmed') {
+        statusBadge.className = 'text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded-md bg-emerald-100 text-emerald-800';
+      } else {
+        statusBadge.className = 'text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded-md bg-slate-100 text-slate-600';
+      }
+
+      // Anomaly Banner
+      const anomalyBanner = document.getElementById('anomalyBanner');
+      if (flags.length) {
+        anomalyBanner.classList.remove('hidden');
+        document.getElementById('anomalyBannerText').innerText = flags[0].reason;
+      } else {
+        anomalyBanner.classList.add('hidden');
+      }
+
+      const container = document.getElementById('cartItemsList');
+      if (!items.length) {
+        container.innerHTML = `
+          <div class="text-center py-12 text-slate-400 text-xs">
+            <p class="text-3xl mb-2">🛒</p>
+            <p>Your basket is currently empty.</p>
+            <p class="text-[11px] text-slate-400 mt-1">Chat or tap "+" on products to add items.</p>
+          </div>
+        `;
+        document.getElementById('btnConfirmOrder').disabled = true;
+        return;
+      }
+
+      document.getElementById('btnConfirmOrder').disabled = (order.status === 'confirmed');
+
+      container.innerHTML = items.map(item => `
+        <div class="p-2.5 rounded-xl border border-slate-200 bg-white flex items-center justify-between gap-2">
+          <div class="min-w-0 flex-1">
+            <p class="font-bold text-xs text-slate-900 truncate">${item.product_name}</p>
+            <p class="text-[11px] text-slate-500">₹${item.unit_price.toFixed(2)} &times; ${item.qty} = <strong>₹${item.line_total.toFixed(2)}</strong></p>
+          </div>
+
+          <div class="flex items-center gap-1.5 shrink-0">
+            <button onclick="updateQty('${item.id}', ${item.qty - 1})" class="w-6 h-6 rounded-lg border border-slate-200 flex items-center justify-center text-slate-600 hover:bg-slate-100 text-xs font-bold font-mono">
+              -
+            </button>
+            <span class="w-4 text-center font-bold text-xs text-slate-900">${item.qty}</span>
+            <button onclick="updateQty('${item.id}', ${item.qty + 1})" class="w-6 h-6 rounded-lg border border-slate-200 flex items-center justify-center text-slate-600 hover:bg-slate-100 text-xs font-bold font-mono">
+              +
+            </button>
+            <button onclick="deleteItem('${item.id}')" class="w-6 h-6 rounded-lg text-rose-500 hover:bg-rose-50 flex items-center justify-center ml-1">
+              🗑️
+            </button>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    async function updateQty(itemId, newQty) {
+      if (!currentOrderId) return;
+      if (newQty <= 0) return deleteItem(itemId);
+
+      await fetch(`${API_BASE}/orders/${currentOrderId}/items/${itemId}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ qty: newQty })
+      });
+      await refreshCart(currentOrderId);
+    }
+
+    async function deleteItem(itemId) {
+      if (!currentOrderId) return;
+      await fetch(`${API_BASE}/orders/${currentOrderId}/items/${itemId}`, {
+        method: 'DELETE'
+      });
+      await refreshCart(currentOrderId);
+    }
+
+    async function placeDirectOrder() {
+      if (!currentOrderId) return;
+      const res = await fetch(`${API_BASE}/orders/${currentOrderId}/confirm`, {
+        method: 'POST'
+      });
+      const data = await res.json();
+      if (data.bill) {
+        document.getElementById('billModalContent').innerText = data.bill;
+        document.getElementById('billModal').classList.remove('hidden');
+        await refreshCart(currentOrderId);
+        await loadProducts(); // Refresh live stock counts!
+      }
+    }
+
+    function closeBillModal() {
+      document.getElementById('billModal').classList.add('hidden');
+    }
+
+    // ================= OWNER OPERATIONS PORTAL =================
+    function setMode(mode) {
+      currentMode = mode;
+      const custView = document.getElementById('customerView');
+      const ownerView = document.getElementById('ownerView');
+      const btnCust = document.getElementById('btnCustomerMode');
+      const btnOwner = document.getElementById('btnOwnerMode');
+
+      if (mode === 'customer') {
+        custView.classList.remove('hidden');
+        ownerView.classList.add('hidden');
+        btnCust.className = 'px-3 py-1.5 text-xs font-semibold rounded-lg bg-white shadow-sm text-slate-800 transition';
+        btnOwner.className = 'px-3 py-1.5 text-xs font-semibold rounded-lg text-slate-600 hover:text-slate-900 transition';
+      } else {
+        custView.classList.add('hidden');
+        ownerView.classList.remove('hidden');
+        btnCust.className = 'px-3 py-1.5 text-xs font-semibold rounded-lg text-slate-600 hover:text-slate-900 transition';
+        btnOwner.className = 'px-3 py-1.5 text-xs font-semibold rounded-lg bg-white shadow-sm text-slate-800 transition';
+        loadOwnerDashboard();
+      }
+    }
+
+    async function loadOwnerDashboard() {
+      try {
+        // 1. Metrics
+        const metricsRes = await fetch(`${API_BASE}/stores/${currentStoreId}/metrics`);
+        const metrics = await metricsRes.json();
+        document.getElementById('metricRevenue').innerText = `₹${metrics.total_revenue.toFixed(2)}`;
+        document.getElementById('metricOrders').innerText = metrics.total_orders;
+        document.getElementById('metricConfirmedOrders').innerText = `${metrics.confirmed_orders} confirmed`;
+        document.getElementById('metricAnomalies').innerText = metrics.anomaly_count;
+        document.getElementById('metricLowStock').innerText = metrics.low_stock_count;
+
+        // 2. Orders list
+        const ordersRes = await fetch(`${API_BASE}/stores/${currentStoreId}/orders`);
+        const orders = await ordersRes.json();
+        const ordersListEl = document.getElementById('ownerOrdersList');
+
+        if (!orders.length) {
+          ordersListEl.innerHTML = `<p class="text-xs text-slate-400 py-6 text-center">No orders yet for this store.</p>`;
+        } else {
+          ordersListEl.innerHTML = orders.map(o => `
+            <div class="py-3 flex items-center justify-between text-xs">
+              <div class="space-y-0.5">
+                <div class="flex items-center gap-2">
+                  <span class="font-bold text-slate-900">#${o.id.substring(0, 8).toUpperCase()}</span>
+                  <span class="text-[10px] font-semibold px-2 py-0.2 rounded-full ${o.status === 'confirmed' ? 'bg-emerald-100 text-emerald-800' : 'bg-slate-100 text-slate-700'}">
+                    ${o.status.toUpperCase()}
+                  </span>
+                </div>
+                <p class="text-[11px] text-slate-500">${o.order_items ? o.order_items.length : 0} item(s) • ${o.created_at || 'Recently'}</p>
+              </div>
+              <div class="text-right">
+                <p class="font-extrabold text-sm text-slate-900">₹${o.total.toFixed(2)}</p>
+                <p class="text-[10px] text-emerald-600 font-medium">Customer: ${o.customer_id ? o.customer_id.substring(0, 8) : 'Walk-in'}</p>
+              </div>
+            </div>
+          `).join('');
+        }
+
+        // 3. Inventory Restock List
+        const prodRes = await fetch(`${API_BASE}/stores/${currentStoreId}/products`);
+        const prods = await prodRes.json();
+        const prodListEl = document.getElementById('ownerProductList');
+
+        prodListEl.innerHTML = prods.map(p => `
+          <div class="py-2 flex items-center justify-between">
+            <div>
+              <p class="font-bold text-slate-800">${p.name}</p>
+              <p class="text-[10px] text-slate-400">Stock: <strong class="${p.stock <= 5 ? 'text-rose-600' : 'text-slate-700'}">${p.stock} units</strong> • ₹${p.price.toFixed(2)}</p>
+            </div>
+            <div class="flex items-center gap-1.5">
+              <button onclick="restock('${p.id}', 10)" class="px-2 py-1 rounded bg-slate-100 hover:bg-slate-200 text-[10px] font-bold text-slate-700 transition">
+                +10
+              </button>
+              <button onclick="restock('${p.id}', 25)" class="px-2 py-1 rounded bg-slate-900 hover:bg-slate-800 text-[10px] font-bold text-white transition">
+                +25
+              </button>
+            </div>
+          </div>
+        `).join('');
+
+        // 4. Anomalies Board
+        const anomRes = await fetch(`${API_BASE}/stores/${currentStoreId}/anomalies`);
+        const anoms = await anomRes.json();
+        const anomListEl = document.getElementById('ownerAnomaliesList');
+
+        if (!anoms.length) {
+          anomListEl.innerHTML = `<p class="text-xs text-slate-400 py-4 text-center">No anomalies recorded. All orders within normal rules.</p>`;
+        } else {
+          anomListEl.innerHTML = anoms.map(a => `
+            <div class="p-2.5 rounded-xl border border-amber-200 bg-amber-50/50 space-y-1">
+              <div class="flex items-center justify-between">
+                <span class="font-bold text-amber-900 text-[11px]">⚠️ ${a.severity.toUpperCase()} ALERT</span>
+                <span class="text-[10px] text-slate-400">Order #${a.order_id ? a.order_id.substring(0, 8) : 'N/A'}</span>
+              </div>
+              <p class="text-[11px] text-amber-800">${a.reason}</p>
+            </div>
+          `).join('');
+        }
+
+      } catch (err) {
+        console.error("Owner dashboard load failed:", err);
+      }
+    }
+
+    async function restock(productId, addQty) {
+      try {
+        await fetch(`${API_BASE}/stores/${currentStoreId}/products/${productId}/restock`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ add_qty: addQty })
+        });
+        await loadOwnerDashboard();
+        await loadProducts();
+      } catch (err) {
+        alert("Restock update failed.");
+      }
+    }
+  </script>
+
+</body>
+</html>
