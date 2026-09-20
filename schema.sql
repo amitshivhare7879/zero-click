@@ -124,7 +124,9 @@ INSERT INTO products (id, store_id, name, category, price, stock, unit, alternat
 ('11111111-1111-1111-1111-111111111116', 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11', 'Amul Butter 100g', 'dairy', 56.00, 18, 'pc', 'Mother Dairy Butter 100g'),
 ('11111111-1111-1111-1111-111111111117', 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11', 'Surf Excel Easy Wash 1kg', 'household', 145.00, 20, 'packet', 'Ariel Matic Powder 1kg'),
 ('11111111-1111-1111-1111-111111111118', 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11', 'Ariel Matic Powder 1kg', 'household', 210.00, 15, 'packet', 'Surf Excel Easy Wash 1kg'),
-('11111111-1111-1111-1111-111111111119', 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11', 'Vim Dishwash Gel 500ml', 'household', 105.00, 16, 'bottle', 'Pril Dishwash 500ml');
+('11111111-1111-1111-1111-111111111119', 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11', 'Vim Dishwash Gel 500ml', 'household', 105.00, 16, 'bottle', 'Pril Dishwash 500ml'),
+('11111111-1111-1111-1111-111111111120', 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11', 'Indori Poha 1kg', 'grocery', 55.00, 30, 'packet', 'Indori Poha 500g'),
+('11111111-1111-1111-1111-111111111121', 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11', 'Indori Poha 500g', 'grocery', 30.00, 25, 'packet', 'Indori Poha 1kg');
 
 -- Store 2: Vijay Nagar Products
 INSERT INTO products (id, store_id, name, category, price, stock, unit, alternative_names) VALUES

@@ -2,6 +2,7 @@
 Tools module for Zero-Click Kirana Store Operator.
 Every tool performs discrete operations on Supabase / Postgres and returns structured data.
 """
+import re
 from typing import Dict, Any, List, Optional
 from datetime import datetime
 from .config import supabase
@@ -36,6 +37,20 @@ SYNONYMS = {
     "ariel": "Ariel Matic",
     "vim": "Vim Dishwash",
     "dishwash": "Vim Dishwash",
+    "poha": "Poha",
+    "pohe": "Poha",
+    "indori poha": "Indori Poha",
+    "chivda": "Poha",
+}
+
+UNIT_STOP_WORDS = {
+    "kg", "1kg", "2kg", "3kg", "4kg", "5kg", "10kg",
+    "gm", "g", "gram", "grams", "500g", "500gm", "250g", "250gm", "100g", "100gm",
+    "l", "lt", "ltr", "litre", "liter", "1l", "2l", "5l",
+    "ml", "500ml", "200ml",
+    "packet", "packets", "pkt", "pkts", "pack", "packs",
+    "pouch", "pouches", "pc", "pcs", "piece", "pieces",
+    "bottle", "bottles", "krdo", "kardo", "kar", "do", "de", "chahiye"
 }
 
 
@@ -159,41 +174,44 @@ def lookup_product(store_id: str, product_name: str) -> dict:
     """
     Looks up a product in the specified store's inventory.
     Applies synonym normalization and case-insensitive substring matching.
+    Strips numeric units (1kg, 2l, etc.) to prevent false-positive matches.
     """
+    # Strip leading/trailing digits and units like "1kg", "2 packet", "500gm"
     clean_name = product_name.strip().lower()
+    clean_name = re.sub(r"^\d+\s*(kg|gm|g|l|ltr|litre|ml|packet|pkt|pc|pcs)?\s*", "", clean_name).strip()
+    clean_name = re.sub(r"\b\d+\s*(kg|gm|g|l|ltr|litre|ml|packet|pkt|pc|pcs)\b", "", clean_name).strip()
 
     # Try synonym replacement
-    search_term = product_name
+    search_term = clean_name
     for syn, canonical in SYNONYMS.items():
         if syn in clean_name:
             search_term = canonical
             break
 
     # First attempt: substring match on search_term
-    result = (
-        supabase.table("products")
-        .select("*")
-        .eq("store_id", store_id)
-        .ilike("name", f"%{search_term}%")
-        .execute()
-    )
+    if search_term and search_term not in UNIT_STOP_WORDS:
+        result = (
+            supabase.table("products")
+            .select("*")
+            .eq("store_id", store_id)
+            .ilike("name", f"%{search_term}%")
+            .execute()
+        )
+        if result.data:
+            return {"found": True, "product": result.data[0]}
 
-    if result.data:
-        return {"found": True, "product": result.data[0]}
-
-    # Second attempt: original words substring search
-    words = clean_name.split()
+    # Second attempt: meaningful individual words (ignoring units and numbers)
+    words = [w for w in clean_name.split() if len(w) > 2 and w not in UNIT_STOP_WORDS and not w.isdigit()]
     for word in words:
-        if len(word) > 2:
-            res = (
-                supabase.table("products")
-                .select("*")
-                .eq("store_id", store_id)
-                .ilike("name", f"%{word}%")
-                .execute()
-            )
-            if res.data:
-                return {"found": True, "product": res.data[0]}
+        res = (
+            supabase.table("products")
+            .select("*")
+            .eq("store_id", store_id)
+            .ilike("name", f"%{word}%")
+            .execute()
+        )
+        if res.data:
+            return {"found": True, "product": res.data[0]}
 
     return {"found": False, "product": None}
 

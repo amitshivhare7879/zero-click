@@ -238,6 +238,26 @@ STORE_1_PRODUCTS = [
         "stock": 16,
         "unit": "bottle",
         "alternative_names": "Pril Dishwash 500ml"
+    },
+    {
+        "id": "11111111-1111-1111-1111-111111111120",
+        "store_id": "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11",
+        "name": "Indori Poha 1kg",
+        "category": "grocery",
+        "price": 55.00,
+        "stock": 30,
+        "unit": "packet",
+        "alternative_names": "Indori Poha 500g"
+    },
+    {
+        "id": "11111111-1111-1111-1111-111111111121",
+        "store_id": "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11",
+        "name": "Indori Poha 500g",
+        "category": "grocery",
+        "price": 30.00,
+        "stock": 25,
+        "unit": "packet",
+        "alternative_names": "Indori Poha 1kg"
     }
 ]
 

@@ -68,10 +68,15 @@ HINDI_NUMBERS = {
 def parse_quantity_and_items(text: str) -> List[Tuple[str, int]]:
     """
     Parses compound Hinglish messages like:
-    'Bhaiya 2 packets Ashirvaad atta, 1 Fortune oil aur 3 Maggi bhej do'
-    into [('atta', 2), ('oil', 1), ('maggi', 3)]
+    '2 maggie, 1kg aata, 1kg poha'
+    or '2kg poha krdo'
+    into [('maggie', 2), ('aata', 1), ('poha', 1)]
     """
-    segments = re.split(r"[,+;]|\s+aur\s+", text.lower())
+    clean_text = text.lower()
+    # Separate numbers attached to units: '1kg' -> '1 kg', '2maggie' -> '2 maggie'
+    clean_text = re.sub(r"(\d+)\s*([a-zA-Z]+)", r"\1 \2", clean_text)
+
+    segments = re.split(r"[,+;]|\s+aur\s+", clean_text)
     parsed_items = []
 
     for seg in segments:
@@ -96,7 +101,7 @@ def parse_quantity_and_items(text: str) -> List[Tuple[str, int]]:
                 name_part = seg
 
         name_clean = re.sub(
-            r"\b(bhaiya|bhej\s*do|chahiye|de\s*do|packet|packets|pouch|pouches|pc|pcs|bottle|bottles|kg|l|litre|ek|do|teen|bhi|hata|hatao|kar\s*do|bhi)\b",
+            r"\b(bhaiya|bhej\s*do|chahiye|de\s*do|packet|packets|pkt|pkts|pouch|pouches|pc|pcs|bottle|bottles|kg|kilo|gm|g|gram|grams|l|lt|ltr|litre|liter|ml|ek|do|teen|bhi|hata|hatao|kar\s*do|kardo|krdo|kr\s*do)\b",
             "",
             name_part
         ).strip()
@@ -109,15 +114,40 @@ def parse_quantity_and_items(text: str) -> List[Tuple[str, int]]:
 def check_and_handle_onboarding(store_id: str, phone: str, message: str) -> Optional[Dict[str, Any]]:
     """
     Handles first-time user conversational registration:
-    Step 1: Asks for Full Name
+    Step 1: Asks for Full Name (ignores plain greetings like 'Hi')
     Step 2: Asks for Delivery Address
     Step 3: Saves and activates grocery shopping mode
     """
     customer = tools.get_or_create_customer(store_id, phone)
     step = customer.get("onboarding_step", "completed")
+    msg_strip = message.strip().lower()
+    GREETINGS = {"hi", "hello", "hey", "namaste", "pranam", "start", "/start", "hlo", "helo", "namaskar"}
+
+    # If customer says 'mera naam X hai', update their name anytime
+    name_change_match = re.search(r"(?:mera\s*naam|my\s*name\s*is)\s*[:=]?\s*([a-zA-Z\s]+)", message, flags=re.IGNORECASE)
+    if name_change_match:
+        new_name = name_change_match.group(1).strip().title()
+        tools.update_customer_profile(customer["id"], {"name": new_name})
+        customer["name"] = new_name
 
     if step == "awaiting_name":
-        # Extract clean name from input
+        # Don't save greetings as a person's name!
+        if msg_strip in GREETINGS:
+            reply = (
+                "Namaste! 🙏 Sharma Kirana mein aapka swagat hai.\n"
+                "Kripya apna *Full Name* batayein taaki hum aapka profile setup kar sakein:"
+            )
+            return {
+                "reply": reply,
+                "audit_steps": [
+                    AuditStep(step_number=1, title="First-Time Onboarding", detail="Received greeting. Prompting for customer name.")
+                ],
+                "flags": [],
+                "suggested_alternatives": [],
+                "onboarding_step": "awaiting_name",
+                "customer": customer
+            }
+
         clean_name = re.sub(r"^(mera\s*naam|my\s*name\s*is|i\s*am|naam\s*hai|naam)\s*[:=]?\s*", "", message, flags=re.IGNORECASE).strip()
         if not clean_name:
             clean_name = message.strip().title()
@@ -292,6 +322,7 @@ def run_deterministic_agent(store_id: str, order_id: str, phone: str, message: s
         parsed_items = [(message.strip(), 1)]
 
     added_names = []
+    unfound_names = []
     out_of_stock_messages = []
 
     for prod_query, qty in parsed_items:
@@ -303,13 +334,11 @@ def run_deterministic_agent(store_id: str, order_id: str, phone: str, message: s
 
         lookup = tools.lookup_product(store_id, prod_query)
         if not lookup["found"]:
-            # Check for alternatives
-            alts_res = tools.suggest_alternatives(store_id, "grocery")
-            suggested_alts.extend(alts_res.get("alternatives", []))
+            unfound_names.append(prod_query)
             audit_steps.append(AuditStep(
                 step_number=3,
                 title="Inventory Lookup (Item Not Found)",
-                detail=f"'{prod_query}' stock mein nahi mila. Fetched {len(suggested_alts)} alternatives."
+                detail=f"'{prod_query}' stock mein nahi mila."
             ))
             continue
 
@@ -377,19 +406,18 @@ def run_deterministic_agent(store_id: str, order_id: str, phone: str, message: s
     if added_names:
         reply_parts.append(f"Maine cart mein add kar diya: {', '.join(added_names)}.\nAbhi order total: ₹{updated_order['total']:.2f}.")
 
+    if unfound_names:
+        reply_parts.append(f"Maaf kijiyega, '{', '.join(unfound_names)}' abhi hamare store mein available nahi hai.")
+
     if out_of_stock_messages:
         reply_parts.extend(out_of_stock_messages)
 
     if flags_raised:
         reply_parts.append(f"⚠️ Note: {flags_raised[0]['reason']}.")
 
-    if not added_names and not out_of_stock_messages:
-        if suggested_alts:
-            alt_names = [f"{a['name']} (₹{a['price']})" for a in suggested_alts[:2]]
-            reply_parts.append(f"Aapka requested item available nahi tha. Kya inme se kuch add karein: {', '.join(alt_names)}?")
-        else:
-            reply_parts.append("Namaste! Aap kya order karna chahte hain? Jaise: 2 packet atta, 1 oil aur 3 maggi.")
-    else:
+    if not added_names and not out_of_stock_messages and not unfound_names:
+        reply_parts.append("Namaste! Aap kya mangwana chahte hain? Jaise: 2 packet atta, 1 oil aur 3 maggi.")
+    elif added_names:
         reply_parts.append("Order confirm karne ke liye 'confirm' likhein ya Place Order button dabayein.")
 
     reply = "\n\n".join(reply_parts)
