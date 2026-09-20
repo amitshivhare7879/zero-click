@@ -177,6 +177,21 @@ def update_customer_profile(customer_id: str, body: CustomerUpdateRequest):
     return tools.update_customer_profile(customer_id, updates)
 
 
+@app.get("/customers/{customer_id}/orders")
+def get_customer_orders(customer_id: str):
+    """Customer view: full order history with line items and bills."""
+    return tools.get_customer_order_history(customer_id)
+
+
+@app.get("/customers/phone/{phone}/orders")
+def get_customer_orders_by_phone(phone: str, store_id: Optional[str] = None):
+    """Lookup order history by customer phone number."""
+    cust = tools.get_customer_by_phone(phone, store_id)
+    if not cust:
+        return []
+    return tools.get_customer_order_history(cust["id"])
+
+
 # =====================================================================
 # Order & Cart Modification Endpoints (Direct UI Speed, No LLM Latency)
 # =====================================================================

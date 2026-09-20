@@ -81,10 +81,17 @@ def get_or_create_customer(
     )
     if existing.data:
         cust = existing.data[0]
-        # Update telegram_chat_id if provided and not set
+        updates = {}
+        if name and name.strip() and name.strip() != cust.get("name"):
+            updates["name"] = name.strip()
+            updates["onboarding_step"] = "completed"
+        if address and address.strip() and address.strip() != cust.get("address"):
+            updates["address"] = address.strip()
         if telegram_chat_id and not cust.get("telegram_chat_id"):
-            supabase.table("customers").update({"telegram_chat_id": telegram_chat_id}).eq("id", cust["id"]).execute()
-            cust["telegram_chat_id"] = telegram_chat_id
+            updates["telegram_chat_id"] = telegram_chat_id
+        if updates:
+            supabase.table("customers").update(updates).eq("id", cust["id"]).execute()
+            cust.update(updates)
         return cust
 
     # Determine initial onboarding step
@@ -132,6 +139,20 @@ def get_customer_by_phone(phone: str, store_id: Optional[str] = None) -> Optiona
 def get_customer_by_telegram(telegram_chat_id: str) -> Optional[dict]:
     res = supabase.table("customers").select("*").eq("telegram_chat_id", str(telegram_chat_id)).execute()
     return res.data[0] if res.data else None
+
+
+def get_customer_order_history(customer_id: str) -> List[dict]:
+    """
+    Returns order history for a customer with line items, newest first.
+    """
+    orders_res = (
+        supabase.table("orders")
+        .select("*, order_items(*)")
+        .eq("customer_id", customer_id)
+        .order("created_at", desc=True)
+        .execute()
+    )
+    return orders_res.data or []
 
 
 def list_customers(store_id: Optional[str] = None) -> List[dict]:

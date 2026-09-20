@@ -176,6 +176,9 @@
 
         <!-- Quick Action Prompt Chips -->
         <div class="px-4 py-2 border-t border-slate-100 bg-slate-50/40 flex items-center gap-1.5 overflow-x-auto custom-scroll text-xs">
+          <button onclick="openHistoryModal()" class="shrink-0 bg-blue-50 border border-blue-300 text-blue-800 font-medium px-2.5 py-1 rounded-full shadow-2xs transition">
+            📦 Pichle Orders
+          </button>
           <button onclick="sendQuickPrompt('2 packet atta aur 1 oil bhej do')" class="shrink-0 bg-white border border-slate-200 hover:border-emerald-500 text-slate-700 px-2.5 py-1 rounded-full shadow-2xs transition">
             + 2 Atta & 1 Oil
           </button>
@@ -219,9 +222,14 @@
             </h2>
             <p class="text-xs text-slate-500" id="cartDeliveryAddress">Delivery: Flat 402, Shivalik Heights</p>
           </div>
-          <span id="orderStatusBadge" class="text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded-md bg-slate-100 text-slate-600">
-            DRAFT
-          </span>
+          <div class="flex items-center gap-2">
+            <button onclick="openHistoryModal()" class="text-xs font-bold text-slate-700 hover:text-emerald-700 bg-slate-100 hover:bg-slate-200 px-2.5 py-1 rounded-lg transition flex items-center gap-1">
+              📜 History
+            </button>
+            <span id="orderStatusBadge" class="text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded-md bg-slate-100 text-slate-600">
+              DRAFT
+            </span>
+          </div>
         </div>
 
         <!-- Cart Items Feed -->
@@ -354,48 +362,50 @@
   <!-- ================= LOGIN & USER SWITCHER MODAL ================= -->
   <div id="loginModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-50 hidden flex items-center justify-center p-4">
     <div class="bg-white rounded-3xl max-w-md w-full shadow-2xl border border-slate-200 overflow-hidden">
-      <div class="p-6 border-b border-slate-100 flex items-center justify-between bg-slate-50/50">
+      <div class="p-6 border-b border-slate-100 flex items-center justify-between bg-emerald-50/60">
         <div>
-          <h3 class="text-base font-bold text-slate-900">Select Customer Account</h3>
-          <p class="text-xs text-slate-500">Log in as a pre-seeded user or register a new one</p>
+          <h3 class="text-base font-bold text-slate-900 flex items-center gap-1.5">
+            <span>👋</span>
+            <span>Welcome to Sharma Kirana</span>
+          </h3>
+          <p class="text-xs text-slate-500">Please enter your Name & Delivery Address to start ordering</p>
         </div>
         <button onclick="closeLoginModal()" class="text-slate-400 hover:text-slate-600 text-xl font-bold">&times;</button>
       </div>
 
       <div class="p-6 space-y-4">
+        <!-- Real Customer Onboarding / Login Form -->
+        <div class="space-y-3 text-xs">
+          <div>
+            <label class="block font-semibold text-slate-700 mb-1">Your Full Name <span class="text-rose-500">*</span></label>
+            <input type="text" id="customNameInput" placeholder="e.g. Amit Shivhare" class="w-full rounded-xl border border-slate-200 px-3.5 py-2.5 focus:ring-2 focus:ring-emerald-500 focus:outline-none text-xs" />
+          </div>
+          <div>
+            <label class="block font-semibold text-slate-700 mb-1">Mobile / WhatsApp Number <span class="text-rose-500">*</span></label>
+            <input type="tel" id="customPhoneInput" placeholder="e.g. 9876543210" class="w-full rounded-xl border border-slate-200 px-3.5 py-2.5 focus:ring-2 focus:ring-emerald-500 focus:outline-none text-xs" />
+          </div>
+          <div>
+            <label class="block font-semibold text-slate-700 mb-1">Delivery Address & Flat/Colony <span class="text-rose-500">*</span></label>
+            <input type="text" id="customAddressInput" placeholder="e.g. 19, Riddhi Siddhi Colony, Indore" class="w-full rounded-xl border border-slate-200 px-3.5 py-2.5 focus:ring-2 focus:ring-emerald-500 focus:outline-none text-xs" />
+          </div>
+
+          <button onclick="submitCustomLogin()" class="w-full mt-1 py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl transition text-xs shadow-md shadow-emerald-600/20">
+            Save Profile & Start Shopping 🛒
+          </button>
+        </div>
+
+        <div class="relative flex py-1 items-center">
+          <div class="flex-grow border-t border-slate-200"></div>
+          <span class="flex-shrink mx-3 text-slate-400 text-[11px] font-medium">Or Select Existing Account</span>
+          <div class="flex-grow border-t border-slate-200"></div>
+        </div>
+
         <!-- Pre-seeded real accounts from Supabase -->
         <div>
-          <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">Registered Accounts (Supabase)</label>
-          <div id="modalCustomerList" class="space-y-2">
+          <div id="modalCustomerList" class="space-y-2 max-h-[160px] overflow-y-auto custom-scroll">
             <!-- Dynamically populated from /customers -->
-            <p class="text-xs text-slate-400">Loading users...</p>
+            <p class="text-xs text-slate-400">Loading existing users...</p>
           </div>
-        </div>
-
-        <div class="relative flex py-2 items-center">
-          <div class="flex-grow border-t border-slate-200"></div>
-          <span class="flex-shrink mx-3 text-slate-400 text-xs font-medium">Or Log In With Phone</span>
-          <div class="flex-grow border-t border-slate-200"></div>
-        </div>
-
-        <!-- Custom Login / Registration Form -->
-        <div class="space-y-2.5 text-xs">
-          <div>
-            <label class="block font-medium text-slate-700 mb-1">Phone Number</label>
-            <input type="text" id="customPhoneInput" placeholder="9876543210" class="w-full rounded-xl border border-slate-200 px-3 py-2 focus:ring-2 focus:ring-slate-900 focus:outline-none" />
-          </div>
-          <div>
-            <label class="block font-medium text-slate-700 mb-1">Full Name (optional for existing)</label>
-            <input type="text" id="customNameInput" placeholder="e.g. Rahul Verma" class="w-full rounded-xl border border-slate-200 px-3 py-2 focus:ring-2 focus:ring-slate-900 focus:outline-none" />
-          </div>
-          <div>
-            <label class="block font-medium text-slate-700 mb-1">Delivery Address</label>
-            <input type="text" id="customAddressInput" placeholder="e.g. Scheme 78, Vijay Nagar, Indore" class="w-full rounded-xl border border-slate-200 px-3 py-2 focus:ring-2 focus:ring-slate-900 focus:outline-none" />
-          </div>
-
-          <button onclick="submitCustomLogin()" class="w-full mt-2 py-2.5 bg-slate-900 hover:bg-slate-800 text-white font-bold rounded-xl transition text-xs">
-            Log In / Continue
-          </button>
         </div>
       </div>
     </div>
@@ -425,6 +435,30 @@
     </div>
   </div>
 
+  <!-- ================= CUSTOMER ORDER HISTORY MODAL ================= -->
+  <div id="historyModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-white rounded-3xl max-w-lg w-full shadow-2xl border border-slate-200 p-6 space-y-4">
+      <div class="flex items-center justify-between pb-3 border-b border-slate-100">
+        <div class="flex items-center gap-2">
+          <span class="text-2xl">📦</span>
+          <div>
+            <h3 class="font-bold text-slate-900 text-base">Your Past Orders</h3>
+            <p class="text-xs text-slate-500" id="historyCustomerName">Order history from Supabase</p>
+          </div>
+        </div>
+        <button onclick="closeHistoryModal()" class="text-slate-400 hover:text-slate-600 text-xl font-bold">&times;</button>
+      </div>
+
+      <div id="historyOrdersContent" class="space-y-3 max-h-[380px] overflow-y-auto custom-scroll text-xs">
+        <!-- Injected past orders -->
+      </div>
+
+      <button onclick="closeHistoryModal()" class="w-full py-2.5 bg-slate-900 hover:bg-slate-800 text-white font-bold rounded-xl text-xs transition">
+        Close
+      </button>
+    </div>
+  </div>
+
   <!-- ================= JAVASCRIPT STATE & APPLICATION ENGINE ================= -->
   <script>
     const API_BASE = window.location.origin;
@@ -446,9 +480,25 @@
     window.addEventListener('DOMContentLoaded', async () => {
       await loadStores();
       await loadCustomers();
+
+      const savedUser = localStorage.getItem('kirana_customer_session');
+      if (savedUser) {
+        try {
+          currentCustomer = JSON.parse(savedUser);
+        } catch(e) {}
+      }
+
+      updateUserUI();
       await initCustomerSession();
       await loadProducts();
       await checkBotStatus();
+
+      // On initial startup without a saved profile, prompt user for Name & Address!
+      if (!savedUser) {
+        openLoginModal();
+      } else {
+        showWelcomeChat(currentCustomer.name, currentCustomer.address);
+      }
     });
 
     // ================= STORE & SESSION MANAGEMENT =================
@@ -508,25 +558,35 @@
 
     async function selectCustomer(id, name, phone, address) {
       currentCustomer = { id, name, phone, address };
+      localStorage.setItem('kirana_customer_session', JSON.stringify(currentCustomer));
       updateUserUI();
       closeLoginModal();
       await initCustomerSession();
+      showWelcomeChat(currentCustomer.name, currentCustomer.address);
     }
 
     function updateUserUI() {
       document.getElementById('userNameDisplay').innerText = currentCustomer.name;
       document.getElementById('userPhoneDisplay').innerText = currentCustomer.phone;
-      document.getElementById('userAvatar').innerText = currentCustomer.name.charAt(0).toUpperCase();
+      document.getElementById('userAvatar').innerText = (currentCustomer.name || 'C').charAt(0).toUpperCase();
       document.getElementById('cartDeliveryAddress').innerText = `Delivery: ${currentCustomer.address || 'Indore'}`;
     }
 
     async function submitCustomLogin() {
-      const phone = document.getElementById('customPhoneInput').value.trim();
       const name = document.getElementById('customNameInput').value.trim();
+      const phone = document.getElementById('customPhoneInput').value.trim();
       const address = document.getElementById('customAddressInput').value.trim();
 
+      if (!name) {
+        alert("Please enter your Full Name.");
+        return;
+      }
       if (!phone) {
-        alert("Please enter a phone number.");
+        alert("Please enter your Mobile / WhatsApp Number.");
+        return;
+      }
+      if (!address) {
+        alert("Please enter your Delivery Address.");
         return;
       }
 
@@ -537,19 +597,36 @@
           body: JSON.stringify({
             store_id: currentStoreId,
             phone: phone,
-            name: name || undefined,
-            address: address || undefined
+            name: name,
+            address: address
           })
         });
         const data = await res.json();
         currentCustomer = data.customer;
+        localStorage.setItem('kirana_customer_session', JSON.stringify(currentCustomer));
         updateUserUI();
         closeLoginModal();
         await initCustomerSession();
         await loadCustomers();
+        showWelcomeChat(currentCustomer.name, currentCustomer.address);
       } catch (err) {
-        alert("Login failed. Please try again.");
+        alert("Account setup failed. Please try again.");
       }
+    }
+
+    function showWelcomeChat(name, address) {
+      const chatContainer = document.getElementById('chatMessages');
+      if (!chatContainer) return;
+      chatContainer.innerHTML = `
+        <div class="flex justify-start">
+          <div class="max-w-[85%] rounded-2xl rounded-bl-sm px-4 py-3 text-xs sm:text-sm bg-slate-100 text-slate-800 leading-relaxed space-y-1">
+            <p>Namaste <strong>${name}</strong>! 🙏 Sharma Kirana mein aapka swagat hai.</p>
+            <p class="text-[11px] text-slate-500">📍 Delivery Address: ${address || 'Indore'}</p>
+            <p class="text-emerald-700 font-semibold pt-1">Aap aaj kya mangwana chahte hain?</p>
+            <p class="text-[11px] text-slate-400">Jaise: <em>2 packet atta, 1 litre oil, 2 maggi</em> ya <em>pichle orders dikhao</em></p>
+          </div>
+        </div>
+      `;
     }
 
     async function initCustomerSession() {
@@ -880,6 +957,65 @@
 
     function closeBillModal() {
       document.getElementById('billModal').classList.add('hidden');
+    }
+
+    // ================= CUSTOMER ORDER HISTORY =================
+    async function openHistoryModal() {
+      if (!currentCustomer) return;
+      document.getElementById('historyCustomerName').innerText = `${currentCustomer.name} (${currentCustomer.phone})`;
+      const contentEl = document.getElementById('historyOrdersContent');
+      contentEl.innerHTML = `<div class="text-center py-8 text-slate-400">Loading order history from Supabase...</div>`;
+      document.getElementById('historyModal').classList.remove('hidden');
+
+      try {
+        const res = await fetch(`${API_BASE}/customers/${currentCustomer.id}/orders`);
+        const orders = await res.json();
+        if (!orders || !orders.length) {
+          contentEl.innerHTML = `
+            <div class="text-center py-8 text-slate-400">
+              <p class="text-3xl mb-2">📦</p>
+              <p class="font-semibold text-slate-700">No past orders found.</p>
+              <p class="text-[11px] mt-1">Confirmed orders from Supabase will appear here.</p>
+            </div>
+          `;
+          return;
+        }
+
+        contentEl.innerHTML = orders.map(o => {
+          const items = o.order_items || [];
+          const isConfirmed = o.status === 'confirmed';
+          const itemsList = items.map(it => 
+            `<div class="flex justify-between text-slate-600 text-[11px]">
+              <span>${it.qty}x ${it.product_name}</span>
+              <span class="font-medium">₹${(it.line_total || it.unit_price * it.qty).toFixed(2)}</span>
+            </div>`
+          ).join('');
+
+          return `
+            <div class="p-3.5 rounded-2xl border border-slate-200 bg-slate-50/70 space-y-2">
+              <div class="flex items-center justify-between">
+                <div class="flex items-center gap-1.5">
+                  <span class="font-bold text-slate-900 text-xs">#${o.id.substring(0, 8).toUpperCase()}</span>
+                  <span class="text-[10px] font-semibold px-2 py-0.5 rounded-full ${isConfirmed ? 'bg-emerald-100 text-emerald-800' : 'bg-slate-200 text-slate-700'}">
+                    ${o.status.toUpperCase()}
+                  </span>
+                </div>
+                <span class="font-extrabold text-xs text-slate-900">₹${Number(o.total || 0).toFixed(2)}</span>
+              </div>
+              <p class="text-[10px] text-slate-400">📅 ${new Date(o.confirmed_at || o.created_at).toLocaleString()}</p>
+              <div class="pt-2 border-t border-slate-200/60 space-y-1">
+                ${itemsList || '<p class="text-[11px] text-slate-400">No line items</p>'}
+              </div>
+            </div>
+          `;
+        }).join('');
+      } catch (err) {
+        contentEl.innerHTML = `<p class="text-rose-500 py-4 text-center">Failed to load order history.</p>`;
+      }
+    }
+
+    function closeHistoryModal() {
+      document.getElementById('historyModal').classList.add('hidden');
     }
 
     // ================= OWNER OPERATIONS PORTAL =================

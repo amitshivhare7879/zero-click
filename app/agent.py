@@ -225,12 +225,37 @@ def run_deterministic_agent(store_id: str, order_id: str, phone: str, message: s
     is_confirm = any(w in msg_lower for w in ["confirm", "haan", "pakka", "place order", "yes", "kar do confirm", "order kar do", "bhej do"])
     is_remove = any(w in msg_lower for w in ["hata", "remove", "delete", "cancel", "mat bhejo", "drop"])
     is_edit_qty = any(w in msg_lower for w in ["ek aur", "kam kar", "badha", "badhao", "badha do", "kardo", "kar do", "change"])
+    is_history = any(w in msg_lower for w in ["history", "pichla", "purana", "past order", "previous order", "last order", "purane order", "orders dikhao", "my orders"])
 
     audit_steps.append(AuditStep(
         step_number=1,
         title="Intent Decomposition",
-        detail=f"Parsed intent: {'CONFIRM_ORDER' if is_confirm else 'REMOVE_ITEM' if is_remove else 'EDIT_QTY' if is_edit_qty else 'ORDER_ITEMS'}"
+        detail=f"Parsed intent: {'ORDER_HISTORY' if is_history else 'CONFIRM_ORDER' if is_confirm else 'REMOVE_ITEM' if is_remove else 'EDIT_QTY' if is_edit_qty else 'ORDER_ITEMS'}"
     ))
+
+    # Case 0: Customer Asks for Past Order History
+    if is_history:
+        customer = tools.get_customer_by_phone(phone, store_id)
+        if customer:
+            history = tools.get_customer_order_history(customer["id"])
+            confirmed_history = [o for o in history if o.get("status") == "confirmed"]
+            if not confirmed_history:
+                reply = f"Namaste {customer.get('name', '')}! Aapka abhi tak koi confirmed order record nahi hai. Naya order place karne ke liye items batayein!"
+            else:
+                lines = [f"📦 *Aapke Pichle Orders ({len(confirmed_history)})*:"]
+                for idx, o in enumerate(confirmed_history[:5], 1):
+                    item_names = ", ".join([f"{i['qty']}x {i['product_name']}" for i in o.get("order_items", [])])
+                    lines.append(f"{idx}. Order #{o['id'][:8].upper()} (₹{o['total']:.2f}) - {o.get('confirmed_at') or o.get('created_at')}")
+                    if item_names:
+                        lines.append(f"   Items: {item_names}")
+                lines.append("\nInme se koi order repeat karna ho toh batayein!")
+                reply = "\n".join(lines)
+            return {
+                "reply": reply,
+                "audit_steps": [AuditStep(step_number=1, title="Customer Order History", detail=f"Fetched {len(confirmed_history)} confirmed orders from database")],
+                "flags": [],
+                "suggested_alternatives": []
+            }
 
     # Case A: Customer Confirms Order
     if is_confirm:
